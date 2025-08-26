@@ -1,0 +1,7 @@
+# TERM_CHAT
+Hey there! My name is Edgar and I'm a software engineering student.
+
+That's a small project just for figuring out how sockets works. The main focus is to make a simple terminal chat where two known friends can talk on a termporaly chat.
+
+## Instalation
+Here I will explain how to install this project and how you can run it :)
