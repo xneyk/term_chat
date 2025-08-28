@@ -1,6 +1,6 @@
 #include "server.h"
-#define BUFFER_SIZE 1024
 
+#define BUFFER_SIZE 1024
 
 void run_server(int port) {
    int socket_fd = init_server_socket(port);
@@ -12,7 +12,7 @@ void run_server(int port) {
 
    close(client_fd);
    close(socket_fd);
-   exit(0);
+   exit(EXIT_SUCCESS);
 };
 
 int init_server_socket(int port) {
@@ -48,9 +48,9 @@ int init_server_socket(int port) {
 
 int accept_client(int socket_fd) {
    struct sockaddr_in client_address;
-
+   socklen_t client_addr_lenght = sizeof(client_address);
    // Wait for a connection for accepting it.
-   int client_fd = accept(socket_fd, (struct sockaddr*)&client_address, sizeof(client_address));
+   int client_fd = accept(socket_fd, (struct sockaddr*)&client_address, &client_addr_lenght);
 
    if (client_fd < 0) {
       perror("[ERROR] socket accept failed");
@@ -66,12 +66,15 @@ void handle_client(int client_fd) {
    while (1) {
       memset(buffer, 0, BUFFER_SIZE);
       if (read(client_fd, buffer, BUFFER_SIZE) <= 0) {
-         printf("[INFO] client desconnected");
+         printf("[INFO] client disconnected\n");
          break; // exit while loop;
       }
       printf("[INFO] recived %s", buffer);
       // bounce the message.
-      send(client_fd, buffer, strlen(buffer), 0);
+      if (send(client_fd, buffer, strlen(buffer), 0) < 0) {
+         printf("[INFO] client disconnected\n");
+         // Here we can check errno to know if it disconnected abruptly or not.
+      }
    }
    free(buffer);  // free communication buffer
 }

@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <arpa/inet.h> // for treating IP
+#include <arpa/inet.h> // for treating IPs and PORT conversions
 
 #ifndef SERVER_H
 #define SERVER_H
 
 /**
- * Main function of server side
+ * @brief Main function of server side
  */
 void run_server(int port);
 
