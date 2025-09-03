@@ -1,4 +1,4 @@
-all: main
+all: term_chat
 
 term_chat: main.c server.o client.o
 	gcc -o term_chat main.c server.o client.o
