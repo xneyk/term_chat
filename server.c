@@ -63,18 +63,43 @@ int accept_client(int socket_fd) {
 
 void handle_client(int client_fd) {
    char *buffer = malloc(BUFFER_SIZE); // reserve communication buffer on dynamic memory
+   fd_set readfds; // set of filedescriptors that need to be watched to read.
+   int max_fd;
    while (1) {
       memset(buffer, 0, BUFFER_SIZE);
-      if (read(client_fd, buffer, BUFFER_SIZE) <= 0) {
-         printf("[INFO] client disconnected\n");
-         break; // exit while loop;
+      FD_ZERO(&readfds);
+      FD_SET(STDIN_FILENO, &readfds); // add STDIN
+      FD_SET(client_fd, &readfds); // add socket's fd
+
+      max_fd = (client_fd > STDIN_FILENO ? client_fd : STDIN_FILENO) + 1; // choose the max value and add 1.
+
+      // Wait for any channel to have activity
+      if (select(max_fd, &readfds, NULL, NULL, NULL) < 0) {
+         perror("[ERROR] failure while select(...) syscall");
+         exit(EXIT_FAILURE);
       }
-      printf("[INFO] recived %s", buffer);
-      // bounce the message.
-      if (send(client_fd, buffer, strlen(buffer), 0) < 0) {
-         printf("[INFO] client disconnected\n");
-         // Here we can check errno to know if it disconnected abruptly or not.
+
+      int bytes_read;
+      // got a message from the client
+      if (FD_ISSET(client_fd, &readfds)) {
+         bytes_read = read(client_fd, buffer, BUFFER_SIZE - 1);
+         if (bytes_read <= 0) {
+            printf("[INFO] client disconnected\n");
+            break; // exit while loop;
+         }
+         buffer[bytes_read] = '\0'; // add string end to the message
+         printf("[CLIENT]: %s\n", buffer); // Show recieved message to server user.
       }
+
+      // got a message to send (stdin ready)
+      if (FD_ISSET(STDIN_FILENO, &readfds)) {
+         bytes_read = read(STDIN_FILENO, buffer, BUFFER_SIZE - 1);
+         if (bytes_read > 0) {
+            buffer[bytes_read] = '\0'; // add string end to the message
+            send(client_fd, buffer, strlen(buffer), 0); // send data to client.
+         }
+      }
+
    }
    free(buffer);  // free communication buffer
 }

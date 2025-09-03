@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 
 #ifndef COMMON_H
 #define COMMON_H

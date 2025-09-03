@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h> // for treating IPs and PORT conversions
+#include <sys/select.h>
+#include <sys/socket.h>
 
 #ifndef SERVER_H
 #define SERVER_H

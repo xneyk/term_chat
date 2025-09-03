@@ -46,9 +46,9 @@ void connect_socket(int socket_fd, char *server_IP, int port) {
 
 void handle_connection(int socket_fd) {
    char *buffer = malloc(BUFFER_SIZE);
-   int bytes_readed = 0;
-   while((bytes_readed = read(STDIN_FILENO, buffer, BUFFER_SIZE))) {
-      if (send(socket_fd, buffer, bytes_readed, 0) < 0) {
+   int bytes_read = 0;
+   while((bytes_read = read(STDIN_FILENO, buffer, BUFFER_SIZE))) {
+      if (send(socket_fd, buffer, bytes_read, 0) < 0) {
          printf("[INFO] server disconnected\n");
          // Here we can check errno to know if it disconnected abruptly or not.
       }
