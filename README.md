@@ -5,3 +5,9 @@ That's a small project just for figuring out how sockets works. The main focus i
 
 ## Instalation
 Here I will explain how to install this project and how you can run it :)
+
+## Build and Run!
+First of all, you need to compile everything to get the binary file. You can do that running the following on the root directory of the project.
+```
+make
+```

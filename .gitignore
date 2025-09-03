@@ -1,0 +1,5 @@
+# git will ignore:
+# - object files
+.o
+# - binary file.
+term_chat
