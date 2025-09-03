@@ -88,14 +88,14 @@ void handle_client(int client_fd) {
             break; // exit while loop;
          }
          buffer[bytes_read] = '\0'; // add string end to the message
-         printf("[CLIENT]: %s\n", buffer); // Show recieved message to server user.
+         printf("[-->]: %s\n", buffer); // show recieved message to server user.
       }
 
       // got a message to send (stdin ready)
       if (FD_ISSET(STDIN_FILENO, &readfds)) {
          bytes_read = read(STDIN_FILENO, buffer, BUFFER_SIZE - 1);
          if (bytes_read > 0) {
-            buffer[bytes_read] = '\0'; // add string end to the message
+            buffer[bytes_read - 1] = '\0'; // replace '\n' --> '\0' for null-terminated-str
             send(client_fd, buffer, strlen(buffer), 0); // send data to client.
          }
       }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h> // for treating IPs and PORT conversions
+#include <pthread.h>
 
 #ifndef CLIENT_H
 #define CLIENT_H
@@ -27,5 +28,10 @@ void connect_socket(int socket_fd, char *server_IP, int port);
  * @brief handles the connection between the client and the server (controls I/O)
  */
 void handle_connection(int socket_fd);
+
+/**
+ * @brief worker function of the thread. It reads the socket and print the messages recived from the server.
+ */
+void *read_socket(void *arg);
 
 #endif

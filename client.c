@@ -2,6 +2,10 @@
 
 #define BUFFER_SIZE 1024
 
+typedef struct {
+   int socket_fd;
+} SocketReadingThreadArgs;
+
 void run_client(char *server_IP, int port) {
    // Create the socket.
    int socket_fd = init_client_socket();
@@ -45,13 +49,43 @@ void connect_socket(int socket_fd, char *server_IP, int port) {
 }
 
 void handle_connection(int socket_fd) {
+   pthread_t tid; // stores the thread id
+   SocketReadingThreadArgs args; // A struct is used to follow a safety pattern.
+   args.socket_fd = socket_fd;
+
+   // create a thread dedicated to read socket and print the recived messages
+   pthread_create(&tid, NULL, read_socket, &args);
+   pthread_detach(tid); // tell SO to free it's resources on dying. (We don't need to collect any data).
+
    char *buffer = malloc(BUFFER_SIZE);
    int bytes_read = 0;
    while((bytes_read = read(STDIN_FILENO, buffer, BUFFER_SIZE))) {
+      buffer[bytes_read - 1] = '\0'; // replace '\n' --> '\0' for null-terminated-str
       if (send(socket_fd, buffer, bytes_read, 0) < 0) {
          printf("[INFO] server disconnected\n");
          // Here we can check errno to know if it disconnected abruptly or not.
+         break;
       }
    }
    free(buffer);
+}
+
+void *read_socket(void *arg) {
+   SocketReadingThreadArgs *thread_args = (SocketReadingThreadArgs *)arg; // convert to the correct type
+   int socket_fd = thread_args->socket_fd;
+
+   char *buffer = malloc(BUFFER_SIZE);
+   int bytes_read = 0;
+   while((bytes_read = read(socket_fd, buffer, BUFFER_SIZE - 1))) {
+      if (bytes_read <= 0) {
+         printf("[INFO]: server disconnected\n");
+         break;
+      }
+
+      buffer[bytes_read] = '\0'; // add string terminator.
+      printf("[-->]: %s\n", buffer); // Show recieved message to client user.
+   }
+   free(buffer);
+
+   return (void *)NULL;
 }
