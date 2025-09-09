@@ -1,6 +1,7 @@
 #include "server.h"
 
 #define BUFFER_SIZE 1024
+#define MAX_PENDING_CONNECTIONS 1
 
 void run_server(int port) {
    int socket_fd = init_server_socket(port);
@@ -37,7 +38,7 @@ int init_server_socket(int port) {
    }
 
    // Listen socket (Tell OS this socket will accept connections)
-   if (listen(socket_fd, 5) < 0) { // maximum 5 pending connections before refusing the next one.
+   if (listen(socket_fd, MAX_PENDING_CONNECTIONS) < 0) { // maximum 5 pending connections before refusing the next one.
       perror("[ERROR] socket listen failed");
       close(socket_fd); // close socket file descriptor
       exit(EXIT_FAILURE);
